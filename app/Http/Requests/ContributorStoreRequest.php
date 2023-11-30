@@ -3,10 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Models\Garden;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class GardenImageStoreRequest extends FormRequest
+class ContributorStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,12 +26,17 @@ class GardenImageStoreRequest extends FormRequest
     {
         return [
 
-            'file'          => 'required|string',
-            'garden_id'     => [
+            'user_id' => [
+
+                'required',
+                Rule::in(User::all()->pluck('id'))
+            ],
+            'garden_id' => [
 
                 'required',
                 Rule::in(Garden::all()->pluck('id'))
-            ]
+            ],
+            'application' => 'required|string|max:255',
         ];
     }
 }

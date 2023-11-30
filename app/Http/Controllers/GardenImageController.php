@@ -16,17 +16,18 @@ use Illuminate\Support\Str;
 
 class GardenImageController extends Controller
 {
-    public function __construct()
-    {
-
-    }
-
     public function index()
     {
-        $gardenImages = QueryBuilder::for(GardenImage::class)
-            ->paginate();
+        $with = [];
 
-        return (new GardenImageCollection((new GardenImageResource($gardenImages))->load('garden')));
+        if (isset($_GET['garden'])) {
+
+            $with[] = 'garden';
+        }
+
+        $gardenImages = QueryBuilder::for(GardenImage::with($with))->paginate();
+
+        return new GardenImageCollection($gardenImages);
     }
 
     public function store(GardenImageStoreRequest $request)
@@ -43,15 +44,21 @@ class GardenImageController extends Controller
         $imageName = Str::random(10) . uniqid() . '.' . $extension;
         Storage::put($imageName, base64_decode($image));
         // FINISH: SAVE IMAGE TO FILES
+
         $validated['file'] = $imageName;
         $gardenImage = GardenImage::create($validated);
 
-        return (new GardenImageResource($gardenImage))->load('garden');
+        return new GardenImageResource($gardenImage);
     }
 
     public function show(Request $request, GardenImage $gardenImage)
     {
-        return new GardenImageResource($gardenImage->load(['garden']));
+        if (isset($_GET['garden'])) {
+
+            $gardenImage->load('garden');
+        }
+
+        return new GardenImageResource($gardenImage);
     }
 
     public function destroy(Request $request, GardenImage $gardenImage)

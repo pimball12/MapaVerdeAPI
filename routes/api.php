@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContributorController;
 use App\Http\Controllers\GardenController;
 use App\Http\Controllers\GardenImageController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,4 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('gardens', GardenController::class);
     Route::apiResource('garden_images', GardenImageController::class)->except(['update']);
+    Route::apiResource('messages', MessageController::class)->except(['update']);
+    Route::apiResource('contributors', ContributorController::class);
 });

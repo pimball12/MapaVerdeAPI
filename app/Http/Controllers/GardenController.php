@@ -16,15 +16,36 @@ use Spatie\QueryBuilder\QueryBuilder;
 class GardenController extends Controller
 {
 
-    public function __construct()
-    {
-
-    }
-
     public function index()
     {
-        $gardens = QueryBuilder::for(Garden::class)
-            ->paginate();
+        $with = [];
+
+        if (isset($_GET['owner']))  {
+
+            $with[] = 'owner';
+        }
+
+        if (isset($_GET['main_picture']))  {
+
+            $with[] = 'main_picture';
+        }
+
+        if (isset($_GET['images']))  {
+
+            $with[] = 'images';
+        }
+
+        if (isset($_GET['messages']))  {
+
+            $with[] = 'messages';
+        }
+
+        if (isset($_GET['contributors']))  {
+
+            $with[] = 'contributors';
+        }
+
+        $gardens = QueryBuilder::for(Garden::with($with))->paginate();
 
         return new GardenCollection($gardens);
     }
@@ -49,7 +70,7 @@ class GardenController extends Controller
 
     public function show(Request $request, Garden $garden)
     {
-        return new GardenResource($garden->load(['owner', 'main_picture']));
+        return new GardenResource($garden);
     }
 
     public function destroy(Request $request, Garden $garden)
