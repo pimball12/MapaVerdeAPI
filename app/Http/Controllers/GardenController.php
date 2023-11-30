@@ -70,6 +70,31 @@ class GardenController extends Controller
 
     public function show(Request $request, Garden $garden)
     {
+        if (isset($_GET['owner']))    {
+
+            $garden->load('owner');
+        }
+
+        if (isset($_GET['main_picture']))    {
+
+            $garden->load('main_picture');
+        }
+
+        if (isset($_GET['images']))    {
+
+            $garden->load('images');
+        }
+
+        if (isset($_GET['messages']))    {
+
+            $garden->load('messages');
+        }
+
+        if (isset($_GET['contributors']))    {
+
+            $garden->load('contributors');
+        }
+
         return new GardenResource($garden);
     }
 
