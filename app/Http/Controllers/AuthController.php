@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GardenImage;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 use function Laravel\Prompts\password;
 
@@ -32,7 +35,8 @@ class AuthController extends Controller
         return response()->json([
 
             'access_token' => $user->createToken('api_token')->plainTextToken,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
+            'user' => $user
         ]);
     }
 
@@ -49,10 +53,26 @@ class AuthController extends Controller
 
         $user = User::create($validated);
 
+        if (isset($validated['image_base_64']) && $validated['image_base_64'] != NULL) {
+
+            $image_64 = $validated['image_base_64'];
+            $extension = explode('/', explode(':', substr($image_64, 0, strpos($image_64, ';')))[1])[1];
+            $replace = substr($image_64, 0, strpos($image_64, ',')+1);
+
+            $image = str_replace($replace, '', $image_64);
+            $image = str_replace(' ', '+', $image);
+            $imageName = Str::random(10) . uniqid() . '.' . $extension;
+            Storage::put($imageName, base64_decode($image));
+
+            $user->image_file = $validated['image_base_64'];
+            $user->save();
+        }
+
         return response()->json([
 
             'access_token' => $user->createToken('api_token')->plainTextToken,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
+            'user' => $user
         ], 201);
     }
 }
