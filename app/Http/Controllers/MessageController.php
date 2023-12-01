@@ -26,7 +26,7 @@ class MessageController extends Controller
             $with[] = 'user';
         }
 
-        $messages = QueryBuilder::for(Message::with($with))->paginate();
+        $messages = QueryBuilder::for(Message::with($with))->allowedFilters(['garden_id'])->allowedSorts(['id', 'created_at'])->paginate(40);
 
         return new MessageCollection($messages);
     }
